@@ -1,7 +1,7 @@
 // In the name of Allah, the most gracious, the most merciful
 #include <bits/stdc++.h>
 using namespace std;
-
+// create account
 void signUP()
 {
     cout << "Fill the form to get library card :) \n";
@@ -16,6 +16,7 @@ void signUP()
     cin >> password;
     cout << "Congrats! You have successfully create an account get a library card :)";
 }
+// log in
 void logIn()
 {
     cout << "Fill the form to get library card :) \n";
@@ -26,6 +27,12 @@ void logIn()
     cin >> password;
     cout << "log in successful";
 }
+// about us
+void aboutUs()
+{
+    cout << "\n===========================\n          About Us\n===========================\n\nBurhan Uddin Ashik => 223311161\nSohag Mia => 223311162\nAfia Akter => 223311163\n\n**************************\n*    LMS Console Project\n*      Developed by Varendra University       \n*           31st Batch E Section Students \n*           Subject: Software Engineering\n*      Teacher: Delwar Hossain\n*    Release: November 2023\n**************************\n";
+}
+// main function
 void mainFunc()
 {
     cout << "********************\nWelcome Big & Not Found Library :)\n********************\n\n1.SignUp\n2.LogIn\n3.Show All Books\n4.Show Category\n5.About Us\n\nEnter your choice: ";
@@ -39,12 +46,16 @@ void mainFunc()
     case 2:
         logIn();
         break;
+    case 5:
+        aboutUs();
+        break;
 
     default:
         mainFunc();
         break;
     }
 }
+
 int main()
 {
 
