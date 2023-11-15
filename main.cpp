@@ -51,6 +51,7 @@ class LMS
 public:
     vector<User> users;
     vector<Book> books;
+    // add books constructor
     LMS()
     {
         books.push_back(Book("Paradoxical Sajid", "9780140237504", "Slap atheism", "Gurdian", "Arif Azad", 5));
@@ -213,7 +214,7 @@ public:
 };
 
 // main function
-void mainFunc(LMS lms, function<void()> logedUserMenu)
+void mainFunc(LMS lms, function<void(LMS lms)> logedUserMenu)
 {
     int menu;
     cout << "********************\nWelcome Big & Not Found Library :)\n********************\n\n1.SignUp\n2.LogIn\n3.Show All Books\n4.Show All Category\n5.Show All Publications\n6.Search by isbn or name\n7.About Us\n\nEnter your choice: ";
@@ -228,7 +229,8 @@ void mainFunc(LMS lms, function<void()> logedUserMenu)
         pair<int, string> loginDAta = logIn();
         isUserLoged = lms.login(loginDAta.first, loginDAta.second);
         if (isUserLoged)
-            logedUserMenu();
+            logedUserMenu(lms);
+        break;
     }
     case 3:
     {
@@ -260,7 +262,7 @@ void mainFunc(LMS lms, function<void()> logedUserMenu)
     }
 }
 // sub main function
-void logedUserMenu()
+void logedUserMenu(LMS lms)
 {
     std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
     int logedMenu;
@@ -270,12 +272,22 @@ void logedUserMenu()
     {
     case 1:
     {
-        cout << "wow\n";
+        lms.showBooks();
         break;
     }
     case 2:
     {
-        cout << "wow good\n";
+        lms.showCategory();
+        break;
+    }
+    case 3:
+    {
+        lms.showPublications();
+        break;
+    }
+    case 4:
+    {
+        lms.showCategory();
         break;
     }
 
