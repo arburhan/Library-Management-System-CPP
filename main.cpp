@@ -51,6 +51,15 @@ class LMS
 public:
     vector<User> users;
     vector<Book> books;
+    LMS()
+    {
+        books.push_back(Book("Paradoxical Sajid", "9780140237504", "Slap atheism", "Gurdian", "Arif Azad", 5));
+        books.push_back(Book("Paradoxical Sajid 2", "9780061120084", "Slap atheism", "Samakalin", "Arif Azad", 8));
+        books.push_back(Book("Akasher Opare Akash", "9780451524935", "Modesty", "Ilm House", "Lost Modesty", 13));
+        books.push_back(Book("Onuvobe Allah'r Name Boichitro", "9780451524936", "Islamic", "Riddho", "Yasir Qadhi :> Ali Ahmad Mabrur", 13));
+        books.push_back(Book("Story Of Beginning", "9780451524939", "Islamic", "Gurdian", "Omar Suleiman :> Ali Ahmad Mabrur", 13));
+    }
+
     // sign up function
     void signup()
     {
@@ -101,6 +110,37 @@ public:
         cout << "Login failed. Invalid ID or password.\n";
         return false;
     }
+    // show all books
+    void showBooks()
+    {
+        int listCount = 1;
+        for (const auto &book : books)
+        {
+            cout << listCount << ". " << book.name << "\n";
+            listCount++;
+        }
+    }
+    // show all category
+    void showCategory()
+    {
+        int listCount = 1;
+        for (const auto &book : books)
+        {
+            cout << listCount << ". " << book.category << "\n";
+            listCount++;
+        }
+    }
+    // show all publications
+    void showPublications()
+    {
+        int listCount = 1;
+        for (const auto &book : books)
+        {
+            cout << listCount << ". " << book.publication << "\n";
+            listCount++;
+        }
+    }
+    // add book (admin)
     void addBook()
     {
         cout << "Enter book details:\n";
@@ -139,7 +179,22 @@ public:
 
         cout << "Book added successfully.\n";
     }
-
+    // search isbn or name
+    void searchBook()
+    {
+        cout << "\nenter isbn or name: ";
+        string item;
+        cin >> item;
+        for (const auto &book : books)
+        {
+            if (book.isbn == item || book.name == item)
+            {
+                cout << book.name << "\n";
+                break;
+            }
+        }
+        cout << "books not found!\n";
+    }
     // about us
     void aboutUs()
     {
@@ -174,6 +229,30 @@ void mainFunc(LMS lms, function<void()> logedUserMenu)
         isUserLoged = lms.login(loginDAta.first, loginDAta.second);
         if (isUserLoged)
             logedUserMenu();
+    }
+    case 3:
+    {
+        cout << "\nall books in our library: \n";
+        lms.showBooks();
+        break;
+    }
+    case 4:
+    {
+        cout << "\nall books in our Category: \n";
+        lms.showCategory();
+        break;
+    }
+    case 5:
+    {
+        cout << "\nall books publications: \n";
+        lms.showPublications();
+        break;
+    }
+    case 6:
+    {
+        cout << "\nsearch by isbn or name: \n";
+        lms.searchBook();
+        break;
     }
 
     default:
