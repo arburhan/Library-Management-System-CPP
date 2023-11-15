@@ -4,7 +4,7 @@ using namespace std;
 // login status
 bool isUserLoged = false;
 bool isAdminLoged = false;
-// create accounts
+// user class
 class User
 {
 public:
@@ -16,6 +16,17 @@ public:
     User(const string &n, int i, const string &e, const string &p)
         : name(n), id(i), email(e), password(p) {}
 };
+// book class
+class Book
+{
+public:
+    string name, isbn, category, publication, author;
+    int stock;
+
+    Book(const string &n, const string &i, const string &c, const string &p, const string &a, int s)
+        : name(n), isbn(i), category(c), publication(p), author(a), stock(s) {}
+};
+
 // log in function
 pair<int, string> logIn()
 {
@@ -39,6 +50,7 @@ class LMS
 {
 public:
     vector<User> users;
+    vector<Book> books;
     // sign up function
     void signup()
     {
@@ -60,12 +72,21 @@ public:
         cin >> p;
         cin >> password;
         password = p + password;
-
-        User newUser(name, id, email, password);
-        users.push_back(newUser);
-        cout << "Congrats! You have successfully created an account and got a library card :)\n";
+        // admin
+        if (id == 223311161 && password == "admin")
+        {
+            User adminUser(name, id, email, password);
+            users.push_back(adminUser);
+            cout << "Congrats! Admin user added successfully.\n";
+        }
+        // normal people
+        else
+        {
+            User newUser(name, id, email, password);
+            users.push_back(newUser);
+            cout << "Congrats! You have successfully created an account and got a library card :)\n";
+        }
     }
-
     // login
     bool login(int id, const string &password)
     {
@@ -79,6 +100,44 @@ public:
         }
         cout << "Login failed. Invalid ID or password.\n";
         return false;
+    }
+    void addBook()
+    {
+        cout << "Enter book details:\n";
+        cout << "Name: ";
+        string name;
+        cin.ignore();
+        getline(cin, name);
+
+        cout << "ISBN: ";
+        string isbn;
+        cin >> isbn;
+
+        cout << "Category: ";
+        string category;
+        cin.ignore();
+        getline(cin, category);
+
+        cout << "Publication: ";
+        string publication;
+        cin.ignore();
+        getline(cin, publication);
+
+        cout << "Author: ";
+        string author;
+        cin.ignore();
+        getline(cin, author);
+        cout << "Stock: ";
+        int stock;
+        cin >> stock;
+
+        // Create a new Book object
+        Book newBook(name, isbn, category, publication, author, stock);
+
+        // Add the new book to the vector
+        books.push_back(newBook);
+
+        cout << "Book added successfully.\n";
     }
 
     // about us
@@ -124,17 +183,21 @@ void mainFunc(LMS lms, function<void()> logedUserMenu)
 // sub main function
 void logedUserMenu()
 {
+    std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
     int logedMenu;
     cout << "********************\nWelcome Big & Not Found Library :)\n********************\n\n1.Show All Books\n2.Show All Category\n3.Show All Publications\n4.Search by isbn or name\n5.About Us\n\nEnter your choice: ";
     cin >> logedMenu;
     switch (logedMenu)
     {
     case 1:
+    {
         cout << "wow\n";
-
+        break;
+    }
     case 2:
     {
         cout << "wow good\n";
+        break;
     }
 
     default:
