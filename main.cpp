@@ -26,8 +26,10 @@ pair<int, string> logIn()
     cout << "id: ";
     cin >> id;
     cout << "password: ";
+    char p;
+    cin >> p;
     cin >> password;
-    cout << "log in successful";
+    password = p + password;
     loginData.first = id;
     loginData.second = password;
     return loginData;
@@ -54,8 +56,10 @@ public:
         getline(cin, email);
         cout << "password: ";
         string password;
-        cin.ignore();
-        getline(cin, password);
+        char p;
+        cin >> p;
+        cin >> password;
+        password = p + password;
 
         User newUser(name, id, email, password);
         users.push_back(newUser);
@@ -70,7 +74,6 @@ public:
             if (user.id == id && user.password == password)
             {
                 cout << "Congratulations! Login successful.\n";
-                isUserLoged = true;
                 return true;
             }
         }
@@ -96,10 +99,10 @@ public:
 };
 
 // main function
-void mainFunc(LMS lms)
+void mainFunc(LMS lms, function<void()> logedUserMenu)
 {
     int menu;
-    cout << "********************\nWelcome Big & Not Found Library :)\n********************\n\n1.SignUp\n2.LogIn\n3.Show All Books\n4.Show Category\n5.Search by isbn or name\n6.About Us\n\nEnter your choice: ";
+    cout << "********************\nWelcome Big & Not Found Library :)\n********************\n\n1.SignUp\n2.LogIn\n3.Show All Books\n4.Show All Category\n5.Show All Publications\n6.Search by isbn or name\n7.About Us\n\nEnter your choice: ";
     cin >> menu;
     switch (menu)
     {
@@ -109,16 +112,39 @@ void mainFunc(LMS lms)
     case 2:
     {
         pair<int, string> loginDAta = logIn();
-        lms.login(loginDAta.first, loginDAta.second);
+        isUserLoged = lms.login(loginDAta.first, loginDAta.second);
+        if (isUserLoged)
+            logedUserMenu();
     }
 
     default:
         cout << "invalid choice! please choose a valid choice :)\n";
     }
 }
+// sub main function
+void logedUserMenu()
+{
+    int logedMenu;
+    cout << "********************\nWelcome Big & Not Found Library :)\n********************\n\n1.Show All Books\n2.Show All Category\n3.Show All Publications\n4.Search by isbn or name\n5.About Us\n\nEnter your choice: ";
+    cin >> logedMenu;
+    switch (logedMenu)
+    {
+    case 1:
+        cout << "wow\n";
+
+    case 2:
+    {
+        cout << "wow good\n";
+    }
+
+    default:
+        cout << "invalid choice! please choose a valid choice :)\n";
+    }
+}
+
 int main()
 {
     LMS lms;
-    mainFunc(lms);
+    mainFunc(lms, logedUserMenu);
     return 0;
 }
