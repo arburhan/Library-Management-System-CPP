@@ -16,6 +16,27 @@ public:
     User(const string &n, int i, const string &e, const string &p)
         : name(n), id(i), email(e), password(p) {}
 };
+// Function to save users to a file
+void saveUsersToFile(const vector<User> &users, const string &filename)
+{
+    ofstream outFile(filename);
+
+    if (outFile.is_open())
+    {
+        for (const auto &user : users)
+        {
+            outFile << user.name << "," << user.id << "," << user.email << "," << user.password << "\n";
+        }
+
+        outFile.close();
+        cout << "Users saved to file successfully.\n";
+    }
+    else
+    {
+        cout << "Unable to open the file for saving users.\n";
+    }
+}
+
 // book class
 class Book
 {
@@ -94,22 +115,55 @@ public:
         {
             User newUser(name, id, email, password);
             users.push_back(newUser);
+            ofstream userFile("user.txt", ios::app); // Open the file in append mode
+            if (userFile.is_open())
+            {
+                userFile << name << " " << id << " " << email << " " << password << endl;
+                userFile.close();
+                cout << "Congrats! You have successfully created an account and got a library card :)\n";
+            }
+            else
+            {
+                cout << "Error: Unable to open user file for writing.\n";
+            }
             cout << "Congrats! You have successfully created an account and got a library card :)\n";
         }
     }
     // login
     bool login(int id, const string &password)
     {
-        for (const auto &user : users)
+        // Read user data from the file
+        ifstream userFile("user.txt");
+        if (userFile.is_open())
         {
-            if (user.id == id && user.password == password)
+            string line;
+            while (getline(userFile, line))
             {
-                cout << "Congratulations! Login successful.\n";
-                return true;
+                istringstream iss(line);
+                string nameFromFile, emailFromFile, passwordFromFile;
+                int idFromFile;
+
+                // Read user data from the file
+                iss >> nameFromFile >> idFromFile >> emailFromFile >> passwordFromFile;
+
+                // Check if entered credentials match
+                if (id == idFromFile && password == passwordFromFile)
+                {
+                    cout << "Congratulations! Login successful.\n";
+                    userFile.close();
+                    return true;
+                }
             }
+
+            cout << "Login failed. Invalid ID or password.\n";
+            userFile.close();
+            return false;
         }
-        cout << "Login failed. Invalid ID or password.\n";
-        return false;
+        else
+        {
+            cout << "Error: Unable to open user file for reading.\n";
+            return false;
+        }
     }
     // show all books
     void showBooks()
@@ -211,6 +265,10 @@ public:
                  << ", Email: " << user.email << ", Password: " << user.password << endl;
         }
     }
+    // issue books
+    void issueBooks()
+    {
+    }
 };
 
 // main function
@@ -229,7 +287,10 @@ void mainFunc(LMS lms, function<void(LMS lms)> logedUserMenu)
         pair<int, string> loginDAta = logIn();
         isUserLoged = lms.login(loginDAta.first, loginDAta.second);
         if (isUserLoged)
+        {
             logedUserMenu(lms);
+            isUserLoged = true;
+        }
         break;
     }
     case 3:
