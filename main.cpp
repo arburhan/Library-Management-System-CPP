@@ -36,16 +36,29 @@ void saveUsersToFile(const vector<User> &users, const string &filename)
         cout << "Unable to open the file for saving users.\n";
     }
 }
-
-// book class
 class Book
 {
 public:
     string name, isbn, category, publication, author;
     int stock;
 
-    Book(const string &n, const string &i, const string &c, const string &p, const string &a, int s)
+    // Constructor
+    Book(const string &n, const string &i, const string &c,
+         const string &p, const string &a, int s)
         : name(n), isbn(i), category(c), publication(p), author(a), stock(s) {}
+
+    // Member function to parse book info from a stringstream
+    static bool parseBookInfo(istringstream &iss, string &name,
+                              string &isbn, string &category,
+                              string &publication, string &author, int &stock)
+    {
+        if (iss >> quoted(name) >> quoted(isbn) >> quoted(category) >>
+            quoted(publication) >> quoted(author) >> stock)
+        {
+            return true;
+        }
+        return false;
+    }
 };
 
 // log in function
@@ -54,32 +67,46 @@ pair<int, string> logIn()
     pair<int, string> loginData;
     cout << "Fill the form to get library card :) \n";
     int id;
-    string password;
     cout << "id: ";
     cin >> id;
     cout << "password: ";
-    char p;
-    cin >> p;
+    string password;
     cin >> password;
-    password = p + password;
     loginData.first = id;
     loginData.second = password;
     return loginData;
 }
+
 // main class
 class LMS
 {
+    bool booksLoaded;
+
 public:
     vector<User> users;
     vector<Book> books;
+    // vector<string> books;
     // add books constructor
-    LMS()
+    LMS() : booksLoaded(false) {}
+
+    // Function to save user data to a CSV file
+    void saveUserToCSV(const User &user)
     {
-        books.push_back(Book("Paradoxical Sajid", "9780140237504", "Slap atheism", "Gurdian", "Arif Azad", 5));
-        books.push_back(Book("Paradoxical Sajid 2", "9780061120084", "Slap atheism", "Samakalin", "Arif Azad", 8));
-        books.push_back(Book("Akasher Opare Akash", "9780451524935", "Modesty", "Ilm House", "Lost Modesty", 13));
-        books.push_back(Book("Onuvobe Allah'r Name Boichitro", "9780451524936", "Islamic", "Riddho", "Yasir Qadhi :> Ali Ahmad Mabrur", 13));
-        books.push_back(Book("Story Of Beginning", "9780451524939", "Islamic", "Gurdian", "Omar Suleiman :> Ali Ahmad Mabrur", 13));
+        ofstream file("users.csv", ios::app); // Open the file in append mode
+
+        if (file.is_open())
+        {
+            // Write user data to the file in CSV format
+            file << user.name << "," << user.id << "," << user.email << "," << user.password << "\n";
+
+            cout << "User data saved to CSV file.\n";
+
+            file.close(); // Close the file
+        }
+        else
+        {
+            cout << "Error opening the CSV file.\n";
+        }
     }
 
     // sign up function
@@ -113,56 +140,93 @@ public:
         // normal people
         else
         {
+            // Create a new user
             User newUser(name, id, email, password);
+
+            // Save the user to the vector and CSV file
             users.push_back(newUser);
-            ofstream userFile("user.txt", ios::app); // Open the file in append mode
-            if (userFile.is_open())
-            {
-                userFile << name << " " << id << " " << email << " " << password << endl;
-                userFile.close();
-                cout << "Congrats! You have successfully created an account and got a library card :)\n";
-            }
-            else
-            {
-                cout << "Error: Unable to open user file for writing.\n";
-            }
+            saveUserToCSV(newUser);
             cout << "Congrats! You have successfully created an account and got a library card :)\n";
         }
     }
-    // login
-    bool login(int id, const string &password)
+    // load users from csv
+    void loadUsersFromCSV()
     {
-        // Read user data from the file
-        ifstream userFile("user.txt");
-        if (userFile.is_open())
+        ifstream file("users.csv");
+
+        if (file.is_open())
         {
             string line;
-            while (getline(userFile, line))
+
+            // Read the first line (column headers) and discard it
+            getline(file, line);
+
+            while (getline(file, line))
             {
                 istringstream iss(line);
-                string nameFromFile, emailFromFile, passwordFromFile;
-                int idFromFile;
+                string name, email, password;
+                int id;
 
-                // Read user data from the file
-                iss >> nameFromFile >> idFromFile >> emailFromFile >> passwordFromFile;
-
-                // Check if entered credentials match
-                if (id == idFromFile && password == passwordFromFile)
+                // Parse the CSV line into user data
+                if (getline(iss, name, ',') &&
+                    (iss >> id) &&
+                    getline(iss >> ws, email, ',') &&
+                    getline(iss >> ws, password))
                 {
-                    cout << "Congratulations! Login successful.\n";
-                    userFile.close();
-                    return true;
+                    User newUser(name, id, email, password);
+                    users.push_back(newUser);
                 }
             }
 
-            cout << "Login failed. Invalid ID or password.\n";
-            userFile.close();
-            return false;
+            file.close();
         }
         else
         {
-            cout << "Error: Unable to open user file for reading.\n";
-            return false;
+            cout << "Error opening the CSV file.\n";
+        }
+    }
+
+    // Function for user login
+    bool login(int id, const string &password)
+    {
+        for (const auto &user : users)
+        {
+            if (user.id == id && user.password == password)
+            {
+                cout << "Login successful.\n";
+                return true;
+            }
+        }
+
+        cout << "Login failed. Invalid ID or password.\n";
+        return false;
+    }
+
+    // load books
+    void loadBooks()
+    {
+        ifstream bookFile("books.txt");
+        if (bookFile.is_open())
+        {
+            string line;
+            while (getline(bookFile, line))
+            {
+                istringstream iss(line);
+                string nameFromFile, isbnFromFile, categoryFromFile, publicationFromFile, authorFromFile;
+                int stockFromFile;
+
+                // Read book data from the file
+                iss >> nameFromFile >> isbnFromFile >> categoryFromFile >> publicationFromFile >> authorFromFile >> stockFromFile;
+
+                // Create a book object and add it to the vector
+                Book loadedBook(nameFromFile, isbnFromFile, categoryFromFile, publicationFromFile, authorFromFile, stockFromFile);
+                books.push_back(loadedBook);
+            }
+            bookFile.close();
+        }
+        else
+        {
+            cout << "Error: Unable to open books file for reading.\n";
         }
     }
     // show all books
@@ -176,6 +240,8 @@ public:
         }
     }
     // show all category
+
+    // Member function to show unique book categories
     void showCategory()
     {
         int listCount = 1;
@@ -231,8 +297,18 @@ public:
 
         // Add the new book to the vector
         books.push_back(newBook);
-
-        cout << "Book added successfully.\n";
+        // Save book data to the file
+        ofstream bookFile("books.txt", ios::app); // Open the file in append mode
+        if (bookFile.is_open())
+        {
+            bookFile << name << " " << isbn << " " << category << " " << publication << " " << author << " " << stock << endl;
+            bookFile.close();
+            cout << "Book added successfully.\n";
+        }
+        else
+        {
+            cout << "Error: Unable to open books file for writing.\n";
+        }
     }
     // search isbn or name
     void searchBook()
@@ -274,6 +350,7 @@ public:
 // main function
 void mainFunc(LMS lms, function<void(LMS lms)> logedUserMenu)
 {
+    lms.loadUsersFromCSV();
     int menu;
     cout << "********************\nWelcome Big & Not Found Library :)\n********************\n\n1.SignUp\n2.LogIn\n3.Show All Books\n4.Show All Category\n5.Show All Publications\n6.Search by isbn or name\n7.About Us\n\nEnter your choice: ";
     cin >> menu;
@@ -325,7 +402,7 @@ void mainFunc(LMS lms, function<void(LMS lms)> logedUserMenu)
 // sub main function
 void logedUserMenu(LMS lms)
 {
-    std::cin.ignore(std::numeric_limits<std::streamsize>::max(), '\n');
+    cin.ignore(numeric_limits<streamsize>::max(), '\n');
     int logedMenu;
     cout << "********************\nWelcome Big & Not Found Library :)\n********************\n\n1.Show All Books\n2.Show All Category\n3.Show All Publications\n4.Search by isbn or name\n5.About Us\n\nEnter your choice: ";
     cin >> logedMenu;
