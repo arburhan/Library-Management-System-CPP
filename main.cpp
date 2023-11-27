@@ -36,6 +36,7 @@ void saveUsersToFile(const vector<User> &users, const string &filename)
         cout << "Unable to open the file for saving users.\n";
     }
 }
+// books class
 class Book
 {
 public:
@@ -47,7 +48,16 @@ public:
          const string &p, const string &a, int s)
         : name(n), isbn(i), category(c), publication(p), author(a), stock(s) {}
 
-    // Member function to parse book info from a stringstream
+    // Function to convert Book data to CSV format
+    string toCSVString() const
+    {
+        ostringstream oss;
+        oss << quoted(name) << "," << quoted(isbn) << "," << quoted(category) << ","
+            << quoted(publication) << "," << quoted(author) << "," << stock;
+        return oss.str();
+    }
+
+    // Static function to parse book info from a stringstream
     static bool parseBookInfo(istringstream &iss, string &name,
                               string &isbn, string &category,
                               string &publication, string &author, int &stock)
@@ -85,7 +95,7 @@ class LMS
 public:
     vector<User> users;
     vector<Book> books;
-    // vector<string> books;
+
     // add books constructor
     LMS() : booksLoaded(false) {}
 
@@ -201,32 +211,37 @@ public:
         cout << "Login failed. Invalid ID or password.\n";
         return false;
     }
-
     // load books
-    void loadBooks()
+    void loadBooksFromCSV()
     {
-        ifstream bookFile("books.txt");
-        if (bookFile.is_open())
+        ifstream file("books.csv");
+
+        if (file.is_open())
         {
             string line;
-            while (getline(bookFile, line))
+            // Skip the first line (column names)
+            getline(file, line);
+
+            while (getline(file, line))
             {
                 istringstream iss(line);
-                string nameFromFile, isbnFromFile, categoryFromFile, publicationFromFile, authorFromFile;
-                int stockFromFile;
+                string name, isbn, category, publication, author;
+                int stock;
 
-                // Read book data from the file
-                iss >> nameFromFile >> isbnFromFile >> categoryFromFile >> publicationFromFile >> authorFromFile >> stockFromFile;
-
-                // Create a book object and add it to the vector
-                Book loadedBook(nameFromFile, isbnFromFile, categoryFromFile, publicationFromFile, authorFromFile, stockFromFile);
-                books.push_back(loadedBook);
+                // Parse the CSV line into book data
+                if (Book::parseBookInfo(iss, name, isbn, category, publication, author, stock))
+                {
+                    Book newBook(name, isbn, category, publication, author, stock);
+                    books.push_back(newBook);
+                }
             }
-            bookFile.close();
+
+            file.close();
+            cout << "Books data loaded from CSV file successfully.\n";
         }
         else
         {
-            cout << "Error: Unable to open books file for reading.\n";
+            cout << "Error opening the CSV file for loading books data.\n";
         }
     }
     // show all books
@@ -272,22 +287,31 @@ public:
 
         cout << "ISBN: ";
         string isbn;
-        cin >> isbn;
+        char isbnc;
+        cin >> isbnc;
+        getline(cin, isbn);
+        isbn = isbnc + isbn;
 
         cout << "Category: ";
         string category;
-        cin.ignore();
+        char categoryC;
+        cin >> categoryC;
         getline(cin, category);
+        category = categoryC + category;
 
         cout << "Publication: ";
         string publication;
-        cin.ignore();
+        char pub;
+        cin >> pub;
         getline(cin, publication);
+        publication = pub + publication;
 
         cout << "Author: ";
         string author;
-        cin.ignore();
+        char auth;
+        cin >> auth;
         getline(cin, author);
+        author = auth + author;
         cout << "Stock: ";
         int stock;
         cin >> stock;
@@ -297,17 +321,21 @@ public:
 
         // Add the new book to the vector
         books.push_back(newBook);
-        // Save book data to the file
-        ofstream bookFile("books.txt", ios::app); // Open the file in append mode
-        if (bookFile.is_open())
+
+        // Save the new book to the file in append mode
+        ofstream outFile("books.csv", ios::app);
+
+        if (outFile.is_open())
         {
-            bookFile << name << " " << isbn << " " << category << " " << publication << " " << author << " " << stock << endl;
-            bookFile.close();
-            cout << "Book added successfully.\n";
+            outFile << newBook.name << "," << newBook.isbn << "," << newBook.category << ","
+                    << newBook.publication << "," << newBook.author << "," << newBook.stock << "\n";
+
+            outFile.close();
+            cout << "Book added and saved to CSV file successfully.\n";
         }
         else
         {
-            cout << "Error: Unable to open books file for writing.\n";
+            cout << "Unable to open the file for saving books.\n";
         }
     }
     // search isbn or name
@@ -351,6 +379,7 @@ public:
 void mainFunc(LMS lms, function<void(LMS lms)> logedUserMenu)
 {
     lms.loadUsersFromCSV();
+    lms.loadUsersFromCSV();
     int menu;
     cout << "********************\nWelcome Big & Not Found Library :)\n********************\n\n1.SignUp\n2.LogIn\n3.Show All Books\n4.Show All Category\n5.Show All Publications\n6.Search by isbn or name\n7.About Us\n\nEnter your choice: ";
     cin >> menu;
@@ -373,7 +402,7 @@ void mainFunc(LMS lms, function<void(LMS lms)> logedUserMenu)
     case 3:
     {
         cout << "\nall books in our library: \n";
-        lms.showBooks();
+        lms.showBooks();lms.showBooks();
         break;
     }
     case 4:
@@ -399,6 +428,7 @@ void mainFunc(LMS lms, function<void(LMS lms)> logedUserMenu)
         cout << "invalid choice! please choose a valid choice :)\n";
     }
 }
+
 // sub main function
 void logedUserMenu(LMS lms)
 {
