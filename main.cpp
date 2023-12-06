@@ -1,5 +1,6 @@
 // In the name of Allah, the most gracious, the most merciful
 #include <bits/stdc++.h>
+#include <conio.h>
 using namespace std;
 // login status
 bool isUserLoged = false;
@@ -79,9 +80,20 @@ pair<int, string> logIn()
     int id;
     cout << "id: ";
     cin >> id;
-    cout << "password: ";
+    char ch = ' ';
     string password;
-    cin >> password;
+    cout << "Password: ";
+    while (ch != 13)
+    {
+        ch = getch();
+        if (ch == 8 || ch == 13 || ch == 32)
+            continue;
+        else
+        {
+            password += ch;
+            cout << "*";
+        }
+    }
     loginData.first = id;
     loginData.second = password;
     return loginData;
@@ -134,12 +146,20 @@ public:
         string email;
         cin.ignore();
         getline(cin, email);
-        cout << "password: ";
+        char ch = ' ';
         string password;
-        char p;
-        cin >> p;
-        cin >> password;
-        password = p + password;
+        cout << "You don't have permit to backspace\nPassword: ";
+        while (ch != 13)
+        {
+            ch = getch();
+            if (ch == 8 || ch == 13 || ch == 32)
+                continue;
+            else
+            {
+                password += ch;
+                cout << "*";
+            }
+        }
         // admin
         if (id == 223311161 && password == "admin")
         {
@@ -402,7 +422,8 @@ void mainFunc(LMS lms, function<void(LMS lms)> logedUserMenu)
     case 3:
     {
         cout << "\nall books in our library: \n";
-        lms.showBooks();lms.showBooks();
+        lms.showBooks();
+        lms.showBooks();
         break;
     }
     case 4:
