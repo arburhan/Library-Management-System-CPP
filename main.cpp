@@ -2,6 +2,7 @@
 #include <bits/stdc++.h>
 #include <conio.h>
 using namespace std;
+
 // ANSI escape codes for text color
 #define RESET "\033[0m"
 #define RED "\033[31m"
@@ -376,7 +377,7 @@ public:
 void mainFunc(LMS lms, function<void(LMS lms)> logedUserMenu)
 {
     int menu;
-    cout << MAGENTA << "********************\nWelcome Big & Not Found Library :)\n********************\n\n"
+    cout << MAGENTA << "\n\n********************\nWelcome Big & Not Found Library :)\n********************\n\n"
          << RESET << "1.SignUp\n2.LogIn\n3.Show All Books\n4.Show All Category\n5.Show All Publications\n6.Search by isbn or name\n7.About Us\n"
          << "8." << RED << "Exit\n\n";
     cout << RESET << "Enter your choice: ";
@@ -451,7 +452,7 @@ void logedUserMenu(LMS lms)
 {
     cin.ignore(numeric_limits<streamsize>::max(), '\n');
     int logedMenu;
-    cout << "********************\nWelcome Big & Not Found Library :)\n********************\n\n1.Show All Books\n2.Show All Category\n3.Show All Publications\n4.Search by isbn or name\n5.About Us\n"
+    cout << "\n\n********************\nWelcome Big & Not Found Library :)\n********************\n\n1.Show All Books\n2.Show All Category\n3.Show All Publications\n4.Search by isbn or name\n5.About Us\n"
          << "6." << RED << "Exit\n\n"
          << RESET << "Enter your choice: ";
     cin >> logedMenu;
@@ -475,6 +476,11 @@ void logedUserMenu(LMS lms)
     case 4:
     {
         lms.showCategory();
+        break;
+    }
+    case 5:
+    {
+        lms.aboutUs();
         break;
     }
     case 6:
