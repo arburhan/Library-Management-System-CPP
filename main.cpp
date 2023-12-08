@@ -13,30 +13,42 @@ public:
     int id;
     string email;
     string password;
-
+    User() : name(""), id(0), email(""), password("") {}
     User(const string &n, int i, const string &e, const string &p)
         : name(n), id(i), email(e), password(p) {}
 };
 // Function to save users to a file
-void saveUsersToFile(const vector<User> &users, const string &filename)
+void saveUser(const User &user)
 {
-    ofstream outFile(filename);
-
-    if (outFile.is_open())
-    {
-        for (const auto &user : users)
-        {
-            outFile << user.name << "," << user.id << "," << user.email << "," << user.password << "\n";
-        }
-
-        outFile.close();
-        cout << "Users saved to file successfully.\n";
-    }
-    else
-    {
-        cout << "Unable to open the file for saving users.\n";
-    }
+    ofstream file("users.csv", ios::app);
+    file << user.id << "," << user.name << "," << user.email << "," << user.password << "\n";
+    file.close();
 }
+// load user
+map<int, User> loadUsers()
+{
+    map<int, User> users;
+    ifstream file("users.csv");
+    string name, email, password;
+    int id;
+    string temp;
+    while (getline(file, temp, ',') && getline(file, name, ',') && getline(file, email, ',') && getline(file, password))
+    {
+        try
+        {
+            id = stoi(temp);
+            users[id] = User(name, id, email, password);
+        }
+        catch (const std::invalid_argument &e)
+        {
+            // Skip this line if the ID cannot be converted to an integer
+            continue;
+        }
+    }
+    file.close();
+    return users;
+}
+
 // books class
 class Book
 {
@@ -164,8 +176,8 @@ public:
         if (id == 223311161 && password == "admin")
         {
             User adminUser(name, id, email, password);
-            users.push_back(adminUser);
-            cout << "Congrats! Admin user added successfully.\n";
+            saveUser(adminUser);
+            cout << "\nCongrats! Admin user added successfully.\n";
         }
         // normal people
         else
@@ -173,64 +185,11 @@ public:
             // Create a new user
             User newUser(name, id, email, password);
 
-            // Save the user to the vector and CSV file
-            users.push_back(newUser);
-            saveUserToCSV(newUser);
-            cout << "Congrats! You have successfully created an account and got a library card :)\n";
-        }
-    }
-    // load users from csv
-    void loadUsersFromCSV()
-    {
-        ifstream file("users.csv");
-
-        if (file.is_open())
-        {
-            string line;
-
-            // Read the first line (column headers) and discard it
-            getline(file, line);
-
-            while (getline(file, line))
-            {
-                istringstream iss(line);
-                string name, email, password;
-                int id;
-
-                // Parse the CSV line into user data
-                if (getline(iss, name, ',') &&
-                    (iss >> id) &&
-                    getline(iss >> ws, email, ',') &&
-                    getline(iss >> ws, password))
-                {
-                    User newUser(name, id, email, password);
-                    users.push_back(newUser);
-                }
-            }
-
-            file.close();
-        }
-        else
-        {
-            cout << "Error opening the CSV file.\n";
+            saveUser(newUser);
+            cout << "\nCongrats! You have successfully created an account and got a library card :)\n";
         }
     }
 
-    // Function for user login
-    bool login(int id, const string &password)
-    {
-        for (const auto &user : users)
-        {
-            if (user.id == id && user.password == password)
-            {
-                cout << "Login successful.\n";
-                return true;
-            }
-        }
-
-        cout << "Login failed. Invalid ID or password.\n";
-        return false;
-    }
     // load books
     void loadBooksFromCSV()
     {
@@ -398,31 +357,36 @@ public:
 // main function
 void mainFunc(LMS lms, function<void(LMS lms)> logedUserMenu)
 {
-    lms.loadUsersFromCSV();
-    lms.loadUsersFromCSV();
     int menu;
     cout << "********************\nWelcome Big & Not Found Library :)\n********************\n\n1.SignUp\n2.LogIn\n3.Show All Books\n4.Show All Category\n5.Show All Publications\n6.Search by isbn or name\n7.About Us\n\nEnter your choice: ";
     cin >> menu;
     switch (menu)
     {
     case 1:
+    {
         lms.signup();
-
+    }
     case 2:
     {
+        map<int, User> users = loadUsers();
         pair<int, string> loginDAta = logIn();
-        isUserLoged = lms.login(loginDAta.first, loginDAta.second);
+        if (users.count(loginDAta.first) && users[loginDAta.first].password == loginDAta.second)
+        {
+            isUserLoged = true;
+        }
+        else
+        {
+            cout << "Login failed. Invalid ID or password.\nlogin again\n";
+        }
         if (isUserLoged)
         {
             logedUserMenu(lms);
-            isUserLoged = true;
         }
         break;
     }
     case 3:
     {
         cout << "\nall books in our library: \n";
-        lms.showBooks();
         lms.showBooks();
         break;
     }
