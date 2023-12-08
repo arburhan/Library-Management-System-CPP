@@ -2,6 +2,16 @@
 #include <bits/stdc++.h>
 #include <conio.h>
 using namespace std;
+// ANSI escape codes for text color
+#define RESET "\033[0m"
+#define RED "\033[31m"
+#define GREEN "\033[32m"
+#define YELLOW "\033[33m"
+#define BLUE "\033[34m"
+#define MAGENTA "\033[35m"
+#define CYAN "\033[36m"
+#define WHITE "\033[37m"
+
 // login status
 bool isUserLoged = false;
 bool isAdminLoged = false;
@@ -111,6 +121,11 @@ pair<int, string> logIn()
     return loginData;
 }
 
+// exit function
+void exitProgram()
+{
+    return;
+}
 // main class
 class LMS
 {
@@ -139,7 +154,8 @@ public:
         }
         else
         {
-            cout << "Error opening the CSV file.\n";
+            cout << RED << "Error opening the CSV file.\n"
+                 << RESET;
         }
     }
 
@@ -220,7 +236,8 @@ public:
         }
         else
         {
-            cout << "Error opening the CSV file for loading books data.\n";
+            cout << RED << "Error opening the CSV file for loading books data.\n"
+                 << RESET;
         }
     }
     // show all books
@@ -336,7 +353,8 @@ public:
     // about us
     void aboutUs()
     {
-        cout << "\n===========================\n          About Us\n===========================\n\nBurhan Uddin Ashik => 223311161\nSohag Mia => 223311162\nAfia Akter => 223311163\n\n**************************\n*    LMS Console Project\n*      Developed by Varendra University       \n*           31st Batch E Section Students \n*           Subject: Software Engineering\n*      Teacher: Delwar Hossain\n*    Release: November 2023\n**************************\n";
+        cout << GREEN << "\n===========================\n          About Us\n===========================\n\nBurhan Uddin Ashik => 223311161\nSohag Mia => 223311162\nAfia Akter => 223311163\n\n**************************\n*    LMS Console Project\n*      Developed by Varendra University       \n*           31st Batch E Section Students \n*           Subject: Software Engineering\n*      Teacher: Delwar Hossain\n*    Release: November 2023\n**************************\n"
+             << RESET;
     }
     // print all users
     void printAllUsers()
@@ -358,7 +376,10 @@ public:
 void mainFunc(LMS lms, function<void(LMS lms)> logedUserMenu)
 {
     int menu;
-    cout << "********************\nWelcome Big & Not Found Library :)\n********************\n\n1.SignUp\n2.LogIn\n3.Show All Books\n4.Show All Category\n5.Show All Publications\n6.Search by isbn or name\n7.About Us\n\nEnter your choice: ";
+    cout << MAGENTA << "********************\nWelcome Big & Not Found Library :)\n********************\n\n"
+         << RESET << "1.SignUp\n2.LogIn\n3.Show All Books\n4.Show All Category\n5.Show All Publications\n6.Search by isbn or name\n7.About Us\n"
+         << "8." << RED << "Exit\n\n";
+    cout << RESET << "Enter your choice: ";
     cin >> menu;
     switch (menu)
     {
@@ -376,7 +397,8 @@ void mainFunc(LMS lms, function<void(LMS lms)> logedUserMenu)
         }
         else
         {
-            cout << "Login failed. Invalid ID or password.\nlogin again\n";
+            cout << RED << "Login failed. Invalid ID or password.\nlogin again\n"
+                 << RESET;
         }
         if (isUserLoged)
         {
@@ -408,9 +430,19 @@ void mainFunc(LMS lms, function<void(LMS lms)> logedUserMenu)
         lms.searchBook();
         break;
     }
+    case 7:
+    {
+        lms.aboutUs();
+    }
+    case 8:
+    {
+        exitProgram();
+        break;
+    }
 
     default:
-        cout << "invalid choice! please choose a valid choice :)\n";
+        cout << RED << "invalid choice! please choose a valid choice :)\n"
+             << RESET;
     }
 }
 
@@ -419,7 +451,9 @@ void logedUserMenu(LMS lms)
 {
     cin.ignore(numeric_limits<streamsize>::max(), '\n');
     int logedMenu;
-    cout << "********************\nWelcome Big & Not Found Library :)\n********************\n\n1.Show All Books\n2.Show All Category\n3.Show All Publications\n4.Search by isbn or name\n5.About Us\n\nEnter your choice: ";
+    cout << "********************\nWelcome Big & Not Found Library :)\n********************\n\n1.Show All Books\n2.Show All Category\n3.Show All Publications\n4.Search by isbn or name\n5.About Us\n"
+         << "6." << RED << "Exit\n\n"
+         << RESET << "Enter your choice: ";
     cin >> logedMenu;
     switch (logedMenu)
     {
@@ -443,9 +477,15 @@ void logedUserMenu(LMS lms)
         lms.showCategory();
         break;
     }
+    case 6:
+    {
+        exitProgram();
+        break;
+    }
 
     default:
-        cout << "invalid choice! please choose a valid choice :)\n";
+        cout << RED << "invalid choice! please choose a valid choice :)\n"
+             << RESET;
     }
 }
 
