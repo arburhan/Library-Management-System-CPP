@@ -371,6 +371,58 @@ public:
     void issueBooks()
     {
     }
+    // admin menu
+    int aMenuList()
+    {
+        cout << MAGENTA << "\n\n***********************\n      Admin Panel\n***********************\n\n"
+             << RESET << "1.Add Books\n2.Show All Books\n3.Show All Users\n4.About Us\n"
+             << "5." << RED << "Exit\n\n";
+        cout << RESET << "Enter your choice: ";
+        int adminMenu;
+        cin >> adminMenu;
+        return adminMenu;
+    }
+    void adminMenu()
+    {
+        int adminMenu;
+        do
+        {
+            adminMenu = aMenuList();
+
+            switch (adminMenu)
+            {
+            case 1:
+            {
+                addBook();
+                break;
+            }
+            case 2:
+            {
+                showBooks();
+                break;
+            }
+            case 3:
+            {
+                showBooks();
+                break;
+            }
+            case 4:
+            {
+                aboutUs();
+                break;
+            }
+            case 5:
+            {
+                exitProgram();
+                break;
+            }
+
+            default:
+                cout << RED << "invalid choice! please choose a valid choice :)\n"
+                     << RESET;
+            }
+        } while (adminMenu != 5);
+    }
 };
 
 // main function
@@ -395,6 +447,10 @@ void mainFunc(LMS lms, function<void(LMS lms)> logedUserMenu)
         if (users.count(loginDAta.first) && users[loginDAta.first].password == loginDAta.second)
         {
             isUserLoged = true;
+        }
+        else if (loginDAta.first == 61 && loginDAta.second == "admin")
+        {
+            lms.adminMenu();
         }
         else
         {
