@@ -71,28 +71,6 @@ public:
     Book(const string &n, const string &i, const string &c,
          const string &p, const string &a, int s)
         : name(n), isbn(i), category(c), publication(p), author(a), stock(s) {}
-
-    /*  // Function to convert Book data to CSV format
-     string toCSVString() const
-     {
-         ostringstream oss;
-         oss << quoted(name) << "," << quoted(isbn) << "," << quoted(category) << ","
-             << quoted(publication) << "," << quoted(author) << "," << stock;
-         return oss.str();
-     }
-
-     // Static function to parse book info from a stringstream
-     static bool parseBookInfo(istringstream &iss, string &name,
-                               string &isbn, string &category,
-                               string &publication, string &author, int &stock)
-     {
-         if (iss >> quoted(name) >> quoted(isbn) >> quoted(category) >>
-             quoted(publication) >> quoted(author) >> stock)
-         {
-             return true;
-         }
-         return false;
-     } */
 };
 
 // log in function
@@ -413,13 +391,14 @@ public:
                 getline(ss, stock, ',');
                 if (name == item || isbn == item)
                 {
-                    cout << "Book found: \n"
+                    cout << GREEN << "Book found: \n"
                          << "Name : " << name << "\n"
                          << "ISBN: " << isbn << "\n"
                          << "Category: " << category << "\n"
                          << "Publication: " << publication << "\n"
                          << "Author: " << author << "\n"
-                         << "Stock: " << stock << "\n";
+                         << "Stock: " << stock << "\n"
+                         << RESET;
                     found = true;
                     break;
                 }
@@ -445,22 +424,81 @@ public:
     void printAllUsers()
     {
         cout << "List of all users:\n";
-        for (const auto &user : users)
+        ifstream inFile("users.csv");
+        if (inFile.is_open())
         {
-            cout << "Name: " << user.name << ", ID: " << user.id
-                 << ", Email: " << user.email << ", Password: " << user.password << endl;
+            string line;
+            getline(inFile, line);
+            int serial = 1;
+            while (getline(inFile, line))
+            {
+                stringstream ss(line);
+                string id, name;
+                getline(ss, id, ',');
+                getline(ss, name, ',');
+                cout << serial << ". " << GREEN << name << RESET << "\n";
+                serial++;
+            }
+            inFile.close();
+        }
+        else
+        {
+            cout << "Unable to open the file for reading usres.\n";
         }
     }
     // issue books
     void issueBooks()
     {
     }
+    // stock out books
+    void stockOut()
+    {
+
+        ifstream inFile("books.csv");
+        if (inFile.is_open())
+        {
+            cout << "Books with 0 stock:\n";
+            string line;
+            getline(inFile, line);
+            while (getline(inFile, line))
+            {
+                stringstream ss(line);
+                string name, isbn, category, publication, author;
+                int stock;
+                getline(ss, name, ',');
+                getline(ss, isbn, ',');
+                getline(ss, category, ',');
+                getline(ss, publication, ',');
+                getline(ss, author, ',');
+                ss >> stock;
+                if (stock == 0)
+                {
+                    cout << YELLOW << "\n"
+                         << "Name : " << name << "\n"
+                         << "ISBN: " << isbn << "\n"
+                         << "Category: " << category << "\n"
+                         << "Publication: " << publication << "\n"
+                         << "Author: " << author << "\n"
+                         << "Stock: " << stock << "\n"
+                         << RESET;
+                }
+            }
+            inFile.close();
+        }
+        else
+        {
+            cout << "Unable to open the file for reading books.\n";
+        }
+    }
     // admin menu
     int aMenuList()
     {
         cout << MAGENTA << "\n\n***********************\n      Admin Panel\n***********************\n\n"
-             << RESET << "1.Add Books\n2.Show All Books\n3.Show All Users\n4.About Us\n"
-             << "5." << RED << "Exit\n\n";
+             << RESET << "1.Add Books\n2.Show All Books\n3.Show All Users\n"
+             << "4." << YELLOW << "Stock out books\n"
+             << RESET
+             << "5.About Us\n"
+             << "6." << RED << "Exit\n\n";
         cout << RESET << "Enter your choice: ";
         int adminMenu;
         cin >> adminMenu;
@@ -487,15 +525,21 @@ public:
             }
             case 3:
             {
-                showBooks();
+
+                printAllUsers();
                 break;
             }
             case 4:
             {
-                aboutUs();
+                stockOut();
                 break;
             }
             case 5:
+            {
+                aboutUs();
+                break;
+            }
+            case 6:
             {
                 exitProgram();
                 break;
@@ -505,7 +549,7 @@ public:
                 cout << RED << "invalid choice! please choose a valid choice :)\n"
                      << RESET;
             }
-        } while (adminMenu != 5);
+        } while (adminMenu != 6);
     }
 };
 
@@ -513,77 +557,80 @@ public:
 void mainFunc(LMS lms, function<void(LMS lms)> logedUserMenu)
 {
     int menu;
-    cout << MAGENTA << "\n\n********************\nWelcome Big & Not Found Library :)\n********************\n\n"
-         << RESET << "1.SignUp\n2.LogIn\n3.Show All Books\n4.Show All Category\n5.Show All Publications\n6.Search by isbn or name\n7.About Us\n"
-         << "8." << RED << "Exit\n\n";
-    cout << RESET << "Enter your choice: ";
-    cin >> menu;
-    switch (menu)
+    do
     {
-    case 1:
-    {
-        lms.signup();
-    }
-    case 2:
-    {
-        map<int, User> users = loadUsers();
-        pair<int, string> loginDAta = logIn();
-        if (users.count(loginDAta.first) && users[loginDAta.first].password == loginDAta.second)
+        cout << MAGENTA << "\n\n********************\nWelcome Big & Not Found Library :)\n********************\n\n"
+             << RESET << "1.SignUp\n2.LogIn\n3.Show All Books\n4.Show All Category\n5.Show All Publications\n6.Search by isbn or name\n7.About Us\n"
+             << "8." << RED << "Exit\n\n";
+        cout << RESET << "Enter your choice: ";
+        cin >> menu;
+        switch (menu)
         {
-            isUserLoged = true;
+        case 1:
+        {
+            lms.signup();
         }
-        else if (loginDAta.first == 61 && loginDAta.second == "admin")
+        case 2:
         {
-            lms.adminMenu();
+            map<int, User> users = loadUsers();
+            pair<int, string> loginDAta = logIn();
+            if (users.count(loginDAta.first) && users[loginDAta.first].password == loginDAta.second)
+            {
+                isUserLoged = true;
+            }
+            else if (loginDAta.first == 61 && loginDAta.second == "admin")
+            {
+                lms.adminMenu();
+            }
+            else
+            {
+                cout << RED << "Login failed. Invalid ID or password.\nlogin again\n"
+                     << RESET;
+            }
+            if (isUserLoged)
+            {
+                logedUserMenu(lms);
+            }
+            break;
         }
-        else
+        case 3:
         {
-            cout << RED << "Login failed. Invalid ID or password.\nlogin again\n"
+            lms.loadBooks();
+            lms.showBooks();
+            break;
+        }
+        case 4:
+        {
+            cout << "\nall books in our Category: \n";
+            lms.showCategory();
+            break;
+        }
+        case 5:
+        {
+            cout << "\nall books publications: \n";
+            lms.showPublications();
+            break;
+        }
+        case 6:
+        {
+            lms.searchBook();
+            break;
+        }
+        case 7:
+        {
+            lms.aboutUs();
+        }
+        case 8:
+        {
+            exitProgram();
+            break;
+        }
+
+        default:
+            cout << RED << "invalid choice! please choose a valid choice :)\n"
                  << RESET;
         }
-        if (isUserLoged)
-        {
-            logedUserMenu(lms);
-        }
-        break;
-    }
-    case 3:
-    {
-        lms.loadBooks();
-        lms.showBooks();
-        break;
-    }
-    case 4:
-    {
-        cout << "\nall books in our Category: \n";
-        lms.showCategory();
-        break;
-    }
-    case 5:
-    {
-        cout << "\nall books publications: \n";
-        lms.showPublications();
-        break;
-    }
-    case 6:
-    {
-        lms.searchBook();
-        break;
-    }
-    case 7:
-    {
-        lms.aboutUs();
-    }
-    case 8:
-    {
-        exitProgram();
-        break;
-    }
-
-    default:
-        cout << RED << "invalid choice! please choose a valid choice :)\n"
-             << RESET;
-    }
+    } while (menu != 8);
 }
 
 // sub main function
@@ -591,47 +638,51 @@ void logedUserMenu(LMS lms)
 {
     cin.ignore(numeric_limits<streamsize>::max(), '\n');
     int logedMenu;
-    cout << "\n\n********************\nWelcome Big & Not Found Library :)\n********************\n\n1.Show All Books\n2.Show All Category\n3.Show All Publications\n4.Search by isbn or name\n5.About Us\n"
-         << "6." << RED << "Exit\n\n"
-         << RESET << "Enter your choice: ";
-    cin >> logedMenu;
-    switch (logedMenu)
+    do
     {
-    case 1:
-    {
-        lms.showBooks();
-        break;
-    }
-    case 2:
-    {
-        lms.showCategory();
-        break;
-    }
-    case 3:
-    {
-        lms.showPublications();
-        break;
-    }
-    case 4:
-    {
-        lms.showCategory();
-        break;
-    }
-    case 5:
-    {
-        lms.aboutUs();
-        break;
-    }
-    case 6:
-    {
-        exitProgram();
-        break;
-    }
 
-    default:
-        cout << RED << "invalid choice! please choose a valid choice :)\n"
-             << RESET;
-    }
+        cout << "\n\n********************\nWelcome Big & Not Found Library :)\n********************\n\n1.Show All Books\n2.Show All Category\n3.Show All Publications\n4.Search by isbn or name\n5.About Us\n"
+             << "6." << RED << "Exit\n\n"
+             << RESET << "Enter your choice: ";
+        cin >> logedMenu;
+        switch (logedMenu)
+        {
+        case 1:
+        {
+            lms.showBooks();
+            break;
+        }
+        case 2:
+        {
+            lms.showCategory();
+            break;
+        }
+        case 3:
+        {
+            lms.showPublications();
+            break;
+        }
+        case 4:
+        {
+            lms.showCategory();
+            break;
+        }
+        case 5:
+        {
+            lms.aboutUs();
+            break;
+        }
+        case 6:
+        {
+            exitProgram();
+            break;
+        }
+
+        default:
+            cout << RED << "invalid choice! please choose a valid choice :)\n"
+                 << RESET;
+        }
+    } while (logedMenu != 6);
 }
 
 int main()
