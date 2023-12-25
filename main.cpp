@@ -72,27 +72,27 @@ public:
          const string &p, const string &a, int s)
         : name(n), isbn(i), category(c), publication(p), author(a), stock(s) {}
 
-    // Function to convert Book data to CSV format
-    string toCSVString() const
-    {
-        ostringstream oss;
-        oss << quoted(name) << "," << quoted(isbn) << "," << quoted(category) << ","
-            << quoted(publication) << "," << quoted(author) << "," << stock;
-        return oss.str();
-    }
+    /*  // Function to convert Book data to CSV format
+     string toCSVString() const
+     {
+         ostringstream oss;
+         oss << quoted(name) << "," << quoted(isbn) << "," << quoted(category) << ","
+             << quoted(publication) << "," << quoted(author) << "," << stock;
+         return oss.str();
+     }
 
-    // Static function to parse book info from a stringstream
-    static bool parseBookInfo(istringstream &iss, string &name,
-                              string &isbn, string &category,
-                              string &publication, string &author, int &stock)
-    {
-        if (iss >> quoted(name) >> quoted(isbn) >> quoted(category) >>
-            quoted(publication) >> quoted(author) >> stock)
-        {
-            return true;
-        }
-        return false;
-    }
+     // Static function to parse book info from a stringstream
+     static bool parseBookInfo(istringstream &iss, string &name,
+                               string &isbn, string &category,
+                               string &publication, string &author, int &stock)
+     {
+         if (iss >> quoted(name) >> quoted(isbn) >> quoted(category) >>
+             quoted(publication) >> quoted(author) >> stock)
+         {
+             return true;
+         }
+         return false;
+     } */
 };
 
 // log in function
@@ -136,8 +136,35 @@ public:
     vector<User> users;
     vector<Book> books;
 
-    // add books constructor
-    LMS() : booksLoaded(false) {}
+    // load books from file
+    void loadBooks()
+    {
+        ifstream inFile("books.csv");
+        if (inFile.is_open())
+        {
+            string line;
+            while (getline(inFile, line))
+            {
+                stringstream ss(line);
+                string name, isbn, category, publication, author;
+                int stock;
+                getline(ss, name, ',');
+                getline(ss, isbn, ',');
+                getline(ss, category, ',');
+                getline(ss, publication, ',');
+                getline(ss, author, ',');
+                ss >> stock;
+                Book newBook(name, isbn, category, publication, author, stock);
+                books.push_back(newBook);
+            }
+
+            inFile.close();
+        }
+        else
+        {
+            cout << "Unable to open the file for loading books.\n";
+        }
+    }
 
     // Function to save user data to a CSV file
     void saveUserToCSV(const User &user)
@@ -207,70 +234,95 @@ public:
         }
     }
 
-    // load books
-    void loadBooksFromCSV()
-    {
-        ifstream file("books.csv");
-
-        if (file.is_open())
-        {
-            string line;
-            // Skip the first line (column names)
-            getline(file, line);
-
-            while (getline(file, line))
-            {
-                istringstream iss(line);
-                string name, isbn, category, publication, author;
-                int stock;
-
-                // Parse the CSV line into book data
-                if (Book::parseBookInfo(iss, name, isbn, category, publication, author, stock))
-                {
-                    Book newBook(name, isbn, category, publication, author, stock);
-                    books.push_back(newBook);
-                }
-            }
-
-            file.close();
-            cout << "Books data loaded from CSV file successfully.\n";
-        }
-        else
-        {
-            cout << RED << "Error opening the CSV file for loading books data.\n"
-                 << RESET;
-        }
-    }
     // show all books
     void showBooks()
     {
-        int listCount = 1;
-        for (const auto &book : books)
+        ifstream inFile("books.csv");
+        if (inFile.is_open())
         {
-            cout << listCount << ". " << book.name << "\n";
-            listCount++;
+            cout << "Book Names:\n";
+            string line;
+            getline(inFile, line);
+            int serial = 1;
+            while (getline(inFile, line))
+            {
+                stringstream ss(line);
+                string name;
+                getline(ss, name, ',');
+                cout << serial << ". " << name << "\n";
+                serial++;
+            }
+            inFile.close();
+        }
+        else
+        {
+            cout << "Unable to open the file for reading books.\n";
         }
     }
-    // show all category
 
     // Member function to show unique book categories
     void showCategory()
     {
-        int listCount = 1;
-        for (const auto &book : books)
+        ifstream inFile("books.csv");
+        if (inFile.is_open())
         {
-            cout << listCount << ". " << book.category << "\n";
-            listCount++;
+            set<string> categories;
+            string line;
+            getline(inFile, line);
+            while (getline(inFile, line))
+            {
+                stringstream ss(line);
+                string name, isbn, category;
+                getline(ss, name, ',');
+                getline(ss, isbn, ',');
+                getline(ss, category, ',');
+                categories.insert(category);
+            }
+            inFile.close();
+            int list = 1;
+            cout << "Book Categories:\n";
+            for (const string &category : categories)
+            {
+                cout << list << ". " << category << "\n";
+                list++;
+            }
+        }
+        else
+        {
+            cout << "Unable to open the file for reading books.\n";
         }
     }
     // show all publications
     void showPublications()
     {
-        int listCount = 1;
-        for (const auto &book : books)
+        ifstream inFile("books.csv");
+        if (inFile.is_open())
         {
-            cout << listCount << ". " << book.publication << "\n";
-            listCount++;
+            set<string> publications;
+            string line;
+            getline(inFile, line);
+            while (getline(inFile, line))
+            {
+                stringstream ss(line);
+                string name, isbn, category, publication;
+                getline(ss, name, ',');
+                getline(ss, isbn, ',');
+                getline(ss, category, ',');
+                getline(ss, publication, ',');
+                publications.insert(publication);
+            }
+            inFile.close();
+            cout << "Book Publications:\n";
+            int listCount = 1;
+            for (const string &publication : publications)
+            {
+                cout << listCount << ". " << publication << "\n";
+                listCount++;
+            }
+        }
+        else
+        {
+            cout << "Unable to open the file for reading books.\n";
         }
     }
     // add book (admin)
@@ -335,21 +387,53 @@ public:
             cout << "Unable to open the file for saving books.\n";
         }
     }
+
     // search isbn or name
     void searchBook()
     {
         cout << "\nenter isbn or name: ";
         string item;
-        cin >> item;
-        for (const auto &book : books)
+        cin.ignore();
+        getline(cin, item);
+        ifstream inFile("books.csv");
+        if (inFile.is_open())
         {
-            if (book.isbn == item || book.name == item)
+            string line;
+            getline(inFile, line);
+            bool found = false;
+            while (getline(inFile, line))
             {
-                cout << book.name << "\n";
-                break;
+                stringstream ss(line);
+                string name, isbn, category, publication, author, stock;
+                getline(ss, name, ',');
+                getline(ss, isbn, ',');
+                getline(ss, category, ',');
+                getline(ss, publication, ',');
+                getline(ss, author, ',');
+                getline(ss, stock, ',');
+                if (name == item || isbn == item)
+                {
+                    cout << "Book found: \n"
+                         << "Name : " << name << "\n"
+                         << "ISBN: " << isbn << "\n"
+                         << "Category: " << category << "\n"
+                         << "Publication: " << publication << "\n"
+                         << "Author: " << author << "\n"
+                         << "Stock: " << stock << "\n";
+                    found = true;
+                    break;
+                }
+            }
+            inFile.close();
+            if (!found)
+            {
+                cout << "No book found.\n";
             }
         }
-        cout << "books not found!\n";
+        else
+        {
+            cout << "Unable to open the file for reading books.\n";
+        }
     }
     // about us
     void aboutUs()
@@ -465,7 +549,7 @@ void mainFunc(LMS lms, function<void(LMS lms)> logedUserMenu)
     }
     case 3:
     {
-        cout << "\nall books in our library: \n";
+        lms.loadBooks();
         lms.showBooks();
         break;
     }
@@ -483,7 +567,6 @@ void mainFunc(LMS lms, function<void(LMS lms)> logedUserMenu)
     }
     case 6:
     {
-        cout << "\nsearch by isbn or name: \n";
         lms.searchBook();
         break;
     }
