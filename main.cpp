@@ -495,9 +495,10 @@ public:
     {
         cout << MAGENTA << "\n\n***********************\n      Admin Panel\n***********************\n\n"
              << RESET << "1.Add Books\n2.Show All Books\n3.Show All Users\n"
-             << "4." << YELLOW << "Stock out books\n"
+             << "4." << YELLOW << "Stock out books\n5."
              << RESET
-             << "5.About Us\n"
+             << CYAN << "About Us\n"
+             << RESET
              << "6." << RED << "Exit\n\n";
         cout << RESET << "Enter your choice: ";
         int adminMenu;
@@ -560,8 +561,9 @@ void mainFunc(LMS lms, function<void(LMS lms)> logedUserMenu)
     do
     {
         cout << MAGENTA << "\n\n********************\nWelcome Big & Not Found Library :)\n********************\n\n"
-             << RESET << "1.SignUp\n2.LogIn\n3.Show All Books\n4.Show All Category\n5.Show All Publications\n6.Search by isbn or name\n7.About Us\n"
-             << "8." << RED << "Exit\n\n";
+             << RESET << "1.SignUp\n2.LogIn\n3.Show All Books\n4.Show All Category\n5." << CYAN << "About Us\n"
+             << RESET
+             << "6." << RED << "Exit\n\n";
         cout << RESET << "Enter your choice: ";
         cin >> menu;
         switch (menu)
@@ -584,7 +586,7 @@ void mainFunc(LMS lms, function<void(LMS lms)> logedUserMenu)
             }
             else
             {
-                cout << RED << "Login failed. Invalid ID or password.\nlogin again\n"
+                cout << RED << "\nLogin failed. Invalid ID or password.\nlogin again\n"
                      << RESET;
             }
             if (isUserLoged)
@@ -607,20 +609,9 @@ void mainFunc(LMS lms, function<void(LMS lms)> logedUserMenu)
         }
         case 5:
         {
-            cout << "\nall books publications: \n";
-            lms.showPublications();
-            break;
-        }
-        case 6:
-        {
-            lms.searchBook();
-            break;
-        }
-        case 7:
-        {
             lms.aboutUs();
         }
-        case 8:
+        case 6:
         {
             exitProgram();
             break;
@@ -630,7 +621,7 @@ void mainFunc(LMS lms, function<void(LMS lms)> logedUserMenu)
             cout << RED << "invalid choice! please choose a valid choice :)\n"
                  << RESET;
         }
-    } while (menu != 8);
+    } while (menu != 6);
 }
 
 // sub main function
@@ -641,7 +632,9 @@ void logedUserMenu(LMS lms)
     do
     {
 
-        cout << "\n\n********************\nWelcome Big & Not Found Library :)\n********************\n\n1.Show All Books\n2.Show All Category\n3.Show All Publications\n4.Search by isbn or name\n5.About Us\n"
+        cout << MAGENTA << "\n\n********************\nWelcome Big & Not Found Library :)\n********************\n\n"
+             << RESET << "1.Show All Books\n2.Show All Category\n3.Show All Publications\n4.Search by isbn or name\n5." << CYAN << "About Us\n"
+             << RESET
              << "6." << RED << "Exit\n\n"
              << RESET << "Enter your choice: ";
         cin >> logedMenu;
@@ -664,7 +657,7 @@ void logedUserMenu(LMS lms)
         }
         case 4:
         {
-            lms.showCategory();
+            lms.searchBook();
             break;
         }
         case 5:
