@@ -238,7 +238,7 @@ public:
         }
     }
 
-    // Member function to show unique book categories
+    // book categories
     void showCategory()
     {
         ifstream inFile("books.csv");
@@ -414,6 +414,7 @@ public:
             cout << "Unable to open the file for reading books.\n";
         }
     }
+
     // about us
     void aboutUs()
     {
