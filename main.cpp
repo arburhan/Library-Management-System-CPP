@@ -108,7 +108,6 @@ void exitProgram()
 // main class
 class LMS
 {
-    bool booksLoaded;
 
 public:
     vector<User> users;
@@ -154,7 +153,7 @@ public:
             // Write user data to the file in CSV format
             file << user.name << "," << user.id << "," << user.email << "," << user.password << "\n";
 
-            cout << "User data saved to CSV file.\n";
+            cout << "User data saved to library database.\n";
 
             file.close(); // Close the file
         }
@@ -358,7 +357,7 @@ public:
                     << newBook.publication << "," << newBook.author << "," << newBook.stock << "\n";
 
             outFile.close();
-            cout << "Book added and saved to CSV file successfully.\n";
+            cout << "Book added and saved to Library.\n";
         }
         else
         {
